@@ -1,0 +1,7 @@
+.Post_Image{
+    width: 100%;
+    object-fit: contain;
+}
+.Post_Caption{
+    font-weight: normal;
+}
