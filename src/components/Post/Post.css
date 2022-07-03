@@ -1,0 +1,28 @@
+.Post{
+    background-color: rgb(255, 255, 255);
+    max-width: 500px;
+    border: 1px solid lightgray;
+    /* padding: 10px; */
+    margin-bottom: 45px;
+}
+.Post_Image{
+    width: 100%;
+    background-color: transparent;
+    object-fit: contain;
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    /* padding: 2px; */ 
+}
+.Post_Caption{
+    font-weight: normal;
+    padding: 20px;
+}
+.Post_Avatar_Header{
+    display: flex;
+    align-items: center;
+    padding: 20px;    
+}
+.Post_Avatar{
+    margin-right: 10px;
+}
+
