@@ -1,7 +1,9 @@
-import {firebase} from "firebase";
-// import {getfirestore} from "@firebase/firestore";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore/lite'
+import { getStorage } from 'firebase/storage';
 
-const firebaseApp = firebase.initializedApp({
+const firebaseConfig = {
     apiKey: "AIzaSyCl34zRCILUZxaR0zUIm8YVmrpE5vX5Ao8",
     authDomain: "insta-clone-16478.firebaseapp.com",
     databaseURL: "https://insta-clone-16478-default-rtdb.firebaseio.com",
@@ -9,15 +11,19 @@ const firebaseApp = firebase.initializedApp({
     storageBucket: "insta-clone-16478.appspot.com",
     messagingSenderId: "369023830323",
     appId: "1:369023830323:web:5ae26382ec8d72ee24d646"
-  });
+};
 
-//   export default firebaseConfig;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app)
+const storage = getStorage(app);
 
-// const app = initializedApp(firebaseConfig);
-// const firestore = getfirestore(app);
+// onAuthStateChange(auth, user => {
+//     if (user != null) {
+//         console.log('logged in');
+//     } else {
+//         console.log('No user');
+//     }
+// });
 
-const db = firebaseApp.firestore();
-const auth = firebase.auth();
-const storage  = firebase.storage();
-
-export {db, auth, storage};
+export { db, auth, storage };
