@@ -1,78 +1,108 @@
 import React from 'react';
-import {useState, useEffect } from 'react'
-import {db} from './firebase';
-import {collection, onSnapshot} from "firebase/firestore"
-import './App.css';
+import { useState, useEffect } from 'react'
+import { db } from './firebase';
+import { collection, onSnapshot } from "firebase/firestore"
 import Post from './components/Post/Post';
 import Header from './components/Header/Header';
+import Box from '@mui/material/Box';
+import { Button, Input } from '@mui/material';
+import Modal from '@mui/material/Modal';
+import './App.css';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 function App() {
-  
-  const [posts, setPosts] = useState([
-    //  {
-    //   username: "Salman_alvi",
-    //   caption: "☮", 
-    //   imageUrl: "https://images.unsplash.com/photo-1445964047600-cdbdb873673d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=1080&ixid=MnwxfDB8MXxyYW5kb218MHx8d2FsbHBhcGVyLGxhbmRzY2FwZXx8fHx8fDE2NTY4NTAwNzg&ixlib=rb-1.2.1&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1920"
-    //  },
-    //  {
-    //   username: "Billllllly",
-    //   caption: "Oi!",
-    //   imageUrl: "./images/billy.jpg" 
-    //  }
-  ]);
+  // const classes = useStyles();
+  // const [modalStyle] = React.useState(getModalStyle)
+
+
+  const [posts, setPosts] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+
 
   // useEffect Runs a piece of code basedon s specific condition
-  // useEffect(()=>{
-  //   db.collection("Post").onSnapshot(snapshot =>{
-  //   //snapshot everytime a new post is added, this code
-  //   setPosts(snapshot.docs.map(doc => doc.data()));
-  // })
-  // },[])
+  useEffect(() => {
+    onSnapshot(collection(db, "Post"), (snapshot) => {
+      setPosts(snapshot.docs.map(doc => doc.data()))
+    })
+  }, []);
 
-  // useEffect(()=>{
-  //   const p = query(collection (db, "Post"))
-  //   const unsub = onSnapshot(p, (querySnapshot) =>{
-  //     console.log("Data", querySnapshot.docs.map(d => doc.data()));
-  //   })
-  // }, [])
+  const handleClose = () => { setOpen(false) };
 
+  const signUp = (event) => {
 
-// const q = query(collection(db, "Post"));
+  }
 
-// const querySnapshot = await getDocs(q);
-// querySnapshot.forEach((doc) => {
-//   // doc.data() is never undefined for query doc snapshots
-//   console.log(doc.id, " => ", doc.data());
-// });
-
-useEffect(()=>{ 
-  onSnapshot(collection(db, "Post"), (snapshot) => 
-  {
-    setPosts(snapshot.docs.map(doc => doc.data()))
-  })
-}, []);
 
   return (
     <div className="App">
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <form className='app_signup'>
+
+            <center>
+
+              <img className='App_headerImage'
+                src="https://www.instagram.com/static/images/web/logged_out_wordmark.png/7a252de00b20.png"
+                alt=""
+              />
+            </center>
+            <Input
+              placeholder="Username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}>
+            </Input>
+
+            <Input
+              placeholder="Email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}>
+            </Input>
+
+            <Input
+              placeholder="Password"
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}>
+            </Input>
+            <Button onClick={signUp}> Sign Up</Button>
+          </form>
+        </Box>
+
+
+
+      </Modal>
+
       <Header />
+      <Button onClick={() => setOpen(true)}>Sign Up</Button>
+
 
       {
-      posts.map(post => (
-        <Post username={post.username} caption ={post.caption} imageUrl = {post.imageUrl}/>
-      ))
-    }
-      {/* <Post username ="Salman_alvi"  
-      caption = "☮" 
-      imageUrl = "https://images.unsplash.com/photo-1445964047600-cdbdb873673d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=1080&ixid=MnwxfDB8MXxyYW5kb218MHx8d2FsbHBhcGVyLGxhbmRzY2FwZXx8fHx8fDE2NTY4NTAwNzg&ixlib=rb-1.2.1&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1920"
-      />
-      <Post username ="Billllllly" 
-      caption = "Oi!" 
-      imageUrl = "./images/billy.jpg"
-      />
-      <Post username ="_._ssss_._" 
-      caption = "😂😂😂😂" 
-      imageUrl = "./images/funny.jpg"
-      /> */}
+        posts.map(post => (
+          <Post username={post.username} caption={post.caption} imageUrl={post.imageUrl} />
+        ))
+      }
+
     </div>
   );
 }
