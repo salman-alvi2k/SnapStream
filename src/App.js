@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react'
-import { db } from './firebase';
+import { auth, db } from './firebase';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, onSnapshot } from "firebase/firestore"
 import Post from './components/Post/Post';
 import Header from './components/Header/Header';
@@ -31,9 +32,36 @@ function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [user, setUser] = useState(null);
 
 
   // useEffect Runs a piece of code basedon s specific condition
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if(authUser){
+        // user logged in...
+        console.log(authUser);
+        setUser(authUser);
+
+        if(authUser.displayName){
+          //don't update username
+        }else{
+          // if we just created someone...
+          return authUser.updateProfile({
+            displayName: username,
+          });
+        }
+      }else{
+        // user logged out...
+        setUser(null); 
+      }
+    })
+    return () => {
+      unsubscribe();
+    }
+  },[user, username]);
+  
   useEffect(() => {
     onSnapshot(collection(db, "Post"), (snapshot) => {
       setPosts(snapshot.docs.map(doc => doc.data()))
@@ -43,10 +71,15 @@ function App() {
   const handleClose = () => { setOpen(false) };
 
   const signUp = (event) => {
-
+    event.preventDefault();
+      createUserWithEmailAndPassword(auth, email, password)
+      .then()
+      .catch((error) => alert(error.message));
   }
-
-
+    
+    // auth.createUserWithEmailAndPassword(email, password)
+    //   .then()
+    //   .catch((error) => alert(error.message));
   return (
     <div className="App">
       <Modal
@@ -59,12 +92,12 @@ function App() {
           <form className='app_signup'>
 
             <center>
-
               <img className='App_headerImage'
                 src="https://www.instagram.com/static/images/web/logged_out_wordmark.png/7a252de00b20.png"
                 alt=""
               />
             </center>
+
             <Input
               placeholder="Username"
               type="text"
