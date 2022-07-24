@@ -11,7 +11,7 @@ const firebaseConfig = {
     storageBucket: "insta-clone-16478.appspot.com",
     messagingSenderId: "369023830323",
     appId: "1:369023830323:web:5ae26382ec8d72ee24d646"
-};
+  };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);

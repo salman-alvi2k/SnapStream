@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react'
 import { auth, db } from './firebase';
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, onSnapshot } from "firebase/firestore"
 import Post from './components/Post/Post';
 import Header from './components/Header/Header';
@@ -29,6 +29,7 @@ function App() {
 
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openSignIn, setOpenSignIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -38,30 +39,22 @@ function App() {
   // useEffect Runs a piece of code basedon s specific condition
 
   useEffect(() => {
+    //unsubscribe perform cleanup action before triggering useEffect
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      if(authUser){
+      if (authUser) {
         // user logged in...
         console.log(authUser);
         setUser(authUser);
-
-        if(authUser.displayName){
-          //don't update username
-        }else{
-          // if we just created someone...
-          return authUser.updateProfile({
-            displayName: username,
-          });
-        }
-      }else{
+      } else {
         // user logged out...
-        setUser(null); 
+        setUser(null);
       }
     })
     return () => {
       unsubscribe();
     }
-  },[user, username]);
-  
+  }, [user, username]);
+
   useEffect(() => {
     onSnapshot(collection(db, "Post"), (snapshot) => {
       setPosts(snapshot.docs.map(doc => doc.data()))
@@ -72,14 +65,29 @@ function App() {
 
   const signUp = (event) => {
     event.preventDefault();
-      createUserWithEmailAndPassword(auth, email, password)
-      .then()
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((authUser) => {
+        return authUser.user.updateProfile({
+          displayName: username
+        })
+      })
       .catch((error) => alert(error.message));
   }
-    
-    // auth.createUserWithEmailAndPassword(email, password)
-    //   .then()
-    //   .catch((error) => alert(error.message));
+
+  // auth.createUserWithEmailAndPassword(email, password)
+  //   .then()
+  //   .catch((error) => alert(error.message));
+
+
+  const signIn = (event) => { 
+    event.preventDefault(); 
+    signInWithEmailAndPassword(auth, email, password)
+    .catch((error) => alert(error.message)); 
+
+    setOpen(false);
+  }
+
   return (
     <div className="App">
       <Modal
@@ -126,13 +134,66 @@ function App() {
 
       </Modal>
 
+
+      <Modal
+        open={openSignIn}
+        onClose={() => setOpenSignIn(false)} 
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <form className='app_signin'>
+
+            <center>
+              <img className='App_headerImage'
+                src="https://www.instagram.com/static/images/web/logged_out_wordmark.png/7a252de00b20.png"
+                alt=""
+              />
+            </center>
+
+            {/* <Input
+              placeholder="Username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}>
+            </Input> */}
+
+            <Input
+              placeholder="Email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}>
+            </Input>
+
+            <Input
+              placeholder="Password"
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}>
+            </Input>
+            <Button onClick={signIn}> Sign In</Button>
+          </form>
+        </Box>
+
+
+
+      </Modal>
+
       <Header />
+
+      {user ? ( //if user exist
+      <Button onClick={() => auth.signOut()}>Log Out</Button> //authsignout()
+      ): (
+        <div className="app_logincontainer">
+      <Button onClick={() => setOpenSignIn(true)}>Sign In</Button>
       <Button onClick={() => setOpen(true)}>Sign Up</Button>
+      </div>
+      )}
 
 
       {
-        posts.map(post => (
-          <Post username={post.username} caption={post.caption} imageUrl={post.imageUrl} />
+        posts.map((post, index) => (
+          <Post key={index} username={post.username} caption={post.caption} imageUrl={post.imageUrl} />
         ))
       }
 
