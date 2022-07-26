@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import { collection, onSnapshot } from "firebase/firestore"
 import Post from './components/Post/Post';
 import Header from './components/Header/Header';
+import ImageUpload from './components/ImageUpload/ImageUpload';
 import Box from '@mui/material/Box';
 import { Button, Input } from '@mui/material';
 import Modal from '@mui/material/Modal';
@@ -90,6 +91,17 @@ function App() {
 
   return (
     <div className="App">
+
+      {/* IG POST $ IMAGE IN FIREBASE
+      caption 
+      file picker
+      post button */}
+      {user.displayName ? (
+      <ImageUpload username={user.displayName}/>
+      ) : (
+        <h3>Sorry You Need To LogIn To Upload</h3>
+      )}
+
       <Modal
         open={open}
         onClose={handleClose}
